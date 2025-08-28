@@ -1,0 +1,101 @@
+services:
+  # Full D2SLAM with TensorRT support
+  d2slam-full:
+    build:
+      context: ..
+      dockerfile: jetpack62/Dockerfile.jetson_orin_base_36.4.0
+      args:
+        - CERES_VERSION=${CERES_VERSION}
+        - CMAKE_VERSION=${CMAKE_VERSION}
+        - OPENCV_VERSION=${OPENCV_VERSION}
+        - ROS_VERSION=${ROS_VERSION}
+        - FAISS_VERSION=${FAISS_VERSION}
+        - USE_PROC=${USE_PROC}
+        - CUDA_ARCH_BIN=${CUDA_ARCH_BIN}
+        - ENABLE_NEON=${ENABLE_NEON}
+    image: d2slam:jetson-orin-36.4.0-full
+    container_name: d2slam-jetpack62-full
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES}
+      - NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES}
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - TZ=${CONTAINER_TIMEZONE}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ../..:/root/swarm_ws/src/D2SLAM:rw
+      - /dev:/dev:rw
+    privileged: true
+    network_mode: host
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+
+  # Minimal D2SLAM for development
+  d2slam-minimal:
+    build:
+      context: ..
+      dockerfile: jetpack62/Dockerfile.jetson_orin_base_36.4.0_minimal
+      args:
+        - CERES_VERSION=${CERES_VERSION}
+        - CMAKE_VERSION=${CMAKE_VERSION}
+        - OPENCV_VERSION=${OPENCV_VERSION}
+        - ROS_VERSION=${ROS_VERSION}
+        - FAISS_VERSION=${FAISS_VERSION}
+        - USE_PROC=${USE_PROC}
+        - CUDA_ARCH_BIN=${CUDA_ARCH_BIN}
+        - ENABLE_NEON=${ENABLE_NEON}
+    image: d2slam:jetson-orin-36.4.0-minimal
+    container_name: d2slam-jetpack62-minimal
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES}
+      - NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES}
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - TZ=${CONTAINER_TIMEZONE}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ../..:/root/swarm_ws/src/D2SLAM:rw
+      - /dev:/dev:rw
+    privileged: true
+    network_mode: host
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+
+  # Development container with additional tools
+  d2slam-dev:
+    build:
+      context: ..
+      dockerfile: jetpack62/Dockerfile.jetson_orin_base_36.4.0_minimal
+      args:
+        - CERES_VERSION=${CERES_VERSION}
+        - CMAKE_VERSION=${CMAKE_VERSION}
+        - OPENCV_VERSION=${OPENCV_VERSION}
+        - ROS_VERSION=${ROS_VERSION}
+        - FAISS_VERSION=${FAISS_VERSION}
+        - USE_PROC=${USE_PROC}
+        - CUDA_ARCH_BIN=${CUDA_ARCH_BIN}
+        - ENABLE_NEON=${ENABLE_NEON}
+    image: d2slam:jetson-orin-36.4.0-dev
+    container_name: d2slam-jetpack62-dev
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES}
+      - NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES}
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - TZ=${CONTAINER_TIMEZONE}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ../..:/root/swarm_ws/src/D2SLAM:rw
+      - /dev:/dev:rw
+      - ./dev_tools:/root/dev_tools:rw
+    privileged: true
+    network_mode: host
+    stdin_open: true
+    tty: true
+    working_dir: /root/swarm_ws
+    command: /bin/bash

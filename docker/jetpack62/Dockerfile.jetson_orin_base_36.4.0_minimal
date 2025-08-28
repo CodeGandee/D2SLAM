@@ -1,0 +1,165 @@
+#Ubuntu 20.04 for ROS Noetic compatibility - Minimal TensorRT version
+FROM nvcr.io/nvidia/l4t-cuda:12.6.11-runtime
+ARG CERES_VERSION=2.1.0
+ENV SWARM_WS=/root/swarm_ws
+ARG CMAKE_VERSION=3.24.1
+ARG OPENCV_VERSION=4.10.0
+ARG ROS_VERSION=noetic
+ARG FAISS_VERSION=1.7.4
+ARG USE_PROC=8
+ENV SWARM_WS=/root/swarm_ws
+ENV DEBIAN_FRONTEND=noninteractive
+ARG CUDA_ARCH_BIN="8.7"
+ARG ENABLE_NEON="ON"
+
+#Basic dependencies
+RUN   apt-get -y update && \
+      TZ=Asia/Beijing apt-get -y install tzdata && \
+      apt-get install -y wget curl lsb-release git \
+      libatlas-base-dev \
+      libeigen3-dev \
+      libgoogle-glog-dev \
+      libsuitesparse-dev \
+      libglib2.0-dev \
+      libyaml-cpp-dev \
+      net-tools \
+      htop \
+      xterm \
+      gdb \
+      zip \
+      unzip \
+      libdw-dev \
+      vim \
+      software-properties-common \
+      ca-certificates \
+      gnupg
+
+# Skip TensorRT installation for now - will use host system libraries
+RUN   echo "Skipping TensorRT installation - will use host system libraries"
+
+#ROS Installation
+RUN sh -c 'echo "deb http://mirrors.ustc.edu.cn/ros/ubuntu/ `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list' && \
+      curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add - && \
+      apt-get update && \
+      apt-get install -y  --no-install-recommends \
+      ros-${ROS_VERSION}-ros-base \
+      ros-${ROS_VERSION}-nav-msgs \
+      ros-${ROS_VERSION}-sensor-msgs \
+      ros-${ROS_VERSION}-cv-bridge \
+      ros-${ROS_VERSION}-rviz \
+      ros-${ROS_VERSION}-image-transport-plugins \
+      ros-${ROS_VERSION}-pcl-ros \
+      build-essential \
+      ros-${ROS_VERSION}-catkin \
+      python3-catkin-tools python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential && \
+      rosdep init && rosdep update
+
+#Replace CMAKE
+RUN   rm /usr/bin/cmake && \
+      wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-Linux-aarch64.sh \
+      -q -O /tmp/cmake-install.sh \
+      && chmod u+x /tmp/cmake-install.sh \
+      && /tmp/cmake-install.sh --skip-license --prefix=/usr/ \
+      && rm /tmp/cmake-install.sh \
+      && cmake --version
+
+#Install OpenCV4 with CUDA (simplified build)
+RUN   apt update && \
+      apt install libgtk2.0-dev -y && \
+      wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip -O opencv.zip && \
+      unzip opencv.zip && \
+      rm opencv.zip && \
+      git clone https://github.com/opencv/opencv_contrib.git -b ${OPENCV_VERSION} && \
+      cd opencv-${OPENCV_VERSION} && \
+      mkdir build && cd build && \
+      cmake .. \
+            -D CMAKE_BUILD_TYPE=RELEASE \
+            -D CMAKE_INSTALL_PREFIX=/usr/local \
+            -D WITH_CUDA=ON \
+            -D WITH_CUDNN=ON \
+            -D WITH_CUBLAS=ON \
+            -D CUDA_ARCH_BIN=${CUDA_ARCH_BIN} \
+            -D CUDA_ARCH_PTX= \
+            -D CUDA_FAST_MATH=ON \
+            -D WITH_TBB=ON \
+            -D BUILD_opencv_python2=OFF \
+            -D BUILD_opencv_python3=ON \
+            -D OPENCV_DNN_CUDA=ON \
+            -D OPENCV_ENABLE_NONFREE=ON \
+            -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
+            -D BUILD_EXAMPLES=OFF \
+            -D BUILD_opencv_java=OFF \
+            -D BUILD_opencv_python=OFF \
+            -D BUILD_TESTS=OFF \
+            -D BUILD_PERF_TESTS=OFF \
+            -D BUILD_opencv_apps=OFF \
+            -D ENABLE_NEON=${ENABLE_NEON} \
+            -D EIGEN_INCLUDE_PATH=/usr/include/eigen3 \
+            -D WITH_EIGEN=ON \
+            -D WITH_IPP=OFF \
+            -D WITH_OPENCL=OFF \
+            -D BUILD_LIST=calib3d,features2d,highgui,dnn,imgproc,imgcodecs,cudev,cudaoptflow,cudaimgproc,cudalegacy,cudaarithm,cudacodec,cudastereo,cudafeatures2d,xfeatures2d,tracking,stereo,aruco,videoio,ccalib && \
+      make -j$(nproc) && \
+      make install
+
+# Install Ceres
+RUN   git clone https://github.com/HKUST-Swarm/ceres-solver -b D2SLAM && \
+      cd ceres-solver && \
+      mkdir build && cd build && \
+      cmake  -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DBUILD_BENCHMARKS=OFF -DCUDA=OFF .. && \
+      make -j$(nproc) install && \
+      rm -rf ../../ceres-solver && \
+      apt-get clean all
+
+#Install LCM
+RUN   git clone https://github.com/lcm-proj/lcm && \
+      cd lcm && \
+      git checkout tags/v1.4.0 && \
+      mkdir build && cd build && \
+      cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DBUILD_BENCHMARKS=OFF .. && \
+      make -j$(nproc) install
+
+#Install Faiss
+RUN   git clone -b v${FAISS_VERSION} --single-branch  https://github.com/facebookresearch/faiss.git && \
+      cd faiss && \
+      cmake -B build -DCMAKE_BUILD_TYPE=Release -DFAISS_ENABLE_PYTHON=OFF  -DFAISS_OPT_LEVEL=NEON -DBUILD_TESTING=OFF -DFAISS_ENABLE_GPU=OFF . && \
+      make -C build -j$(nproc) faiss && \
+      make -C build install && \
+      rm -rf ../faiss
+
+#Install OpenGV
+RUN   git clone https://github.com/HKUST-Swarm/opengv && \
+      mkdir opengv/build && cd opengv/build && cmake .. && make -j$(nproc) && \
+      make install
+
+#Install Backward
+RUN   wget https://raw.githubusercontent.com/bombela/backward-cpp/master/backward.hpp -O /usr/local/include/backward.hpp
+
+# Install Python packages and basic ML libraries
+RUN   apt install python3-pip libopenblas-dev python3-dev -y && \
+      pip3 install numpy cmake
+
+# Skip ONNX Runtime for minimal build - can be added later
+RUN   echo "Skipping ONNX Runtime for minimal build"
+
+# Install basic PyTorch (CPU version for compatibility)
+RUN   pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+# Install for TaichiSLAM
+RUN   pip3 install transformations numpy lcm matplotlib scipy && \
+      apt install ros-${ROS_VERSION}-ros-numpy -y
+
+#Install spdlog
+RUN   wget https://github.com/gabime/spdlog/archive/refs/tags/v1.12.0.tar.gz && \
+      tar -zxvf v1.12.0.tar.gz && \
+      cd spdlog-1.12.0 && \
+      mkdir build && cd build && \
+      cmake .. && make -j$(nproc) && \
+      make install
+
+# Setup workspace
+RUN   mkdir -p ${SWARM_WS}/src && \
+      echo "source /opt/ros/${ROS_VERSION}/setup.bash" >> ~/.bashrc && \
+      echo "source ${SWARM_WS}/devel/setup.bash" >> ~/.bashrc
+
+WORKDIR ${SWARM_WS}

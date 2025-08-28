@@ -13,8 +13,29 @@ Our Docker image includes:
 - Backward 
 - $D^2$SLAM
 
+## 🚀 Quick Start for JetPack 6.2 (Recommended)
 
-## Docker PC
+For **NVIDIA Jetson Orin with JetPack 6.2**, use the organized `jetpack62/` subdirectory:
+
+```bash
+cd jetpack62
+./quickstart.sh           # Quick setup with Docker Compose
+# OR
+./manage.sh help          # Full management options
+```
+
+The `jetpack62/` directory provides:
+- Docker Compose setup with multiple build options
+- Comprehensive management scripts
+- Development tools and validation
+- Complete documentation
+
+## Legacy Docker Builds
+
+
+## Legacy Docker Builds
+
+### Docker PC
 
 To build the Docker image for PC, run the following command:
 
@@ -22,19 +43,23 @@ To build the Docker image for PC, run the following command:
 $ make amd64
 ```
 
-## Docker for Jetson
+### Docker for Jetson (Legacy)
+
+**Note**: For JetPack 6.2, please use the `jetpack62/` subdirectory instead.
 
 This Docker file can be built on a MacBook with Apple Silicon (M1 or M2), X86_64 PC with [qemu support](https://www.stereolabs.com/docs/docker/building-arm-container-on-x86/) or on Jetson. However, in our tests, building on Jetson is takes hours and building on Qemu is even more slow.
 
 We highly recommend building the image on a MacBook Pro with M1/M2 Max. This is possibly the fastest way.
 
-To build the Docker image for $D^2$ SLAM, run:
+To build the Docker image for $D^2$ SLAM (legacy), run:
 
 ```
 $ make jetson
 ```
 
 # No-CUDA configuration
+
+**Note**: For JetPack 6.2, use `jetpack62/` which includes both full and minimal builds.
 
 Target arm64 (Dockerfile.arm64_ros1_noetic) and x86_no_cuda (Dockerfile.x86_no_cuda) provide non-cuda configuration for arm64 and X86-64 devices. Others will depends on CUDA.
 D2VINS only has fully abaility when using CUDA, features will be unsupported without CUDA:
