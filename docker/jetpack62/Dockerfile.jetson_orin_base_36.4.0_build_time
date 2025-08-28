@@ -1,0 +1,52 @@
+# D2SLAM JetPack 6.2 - Build-time Installation
+# Ubuntu 20.04 for ROS Noetic compatibility in Docker on JetPack 6.2 host
+# All dependencies are installed during Docker build
+
+FROM nvidia/cuda:12.6.0-runtime-ubuntu20.04
+
+# Build arguments
+ARG CERES_VERSION=2.1.0
+ARG CMAKE_VERSION=3.24.1
+ARG OPENCV_VERSION=4.10.0
+ARG ROS_VERSION=noetic
+ARG FAISS_VERSION=1.7.4
+ARG USE_PROC=8
+ARG CUDA_ARCH_BIN="8.7"
+ARG ENABLE_NEON="ON"
+ARG SSH_PASSWORD=d2slam123
+
+# Environment variables
+ENV SWARM_WS=/root/swarm_ws
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Beijing
+
+# Copy installation scripts
+COPY scripts/ /opt/d2slam/scripts/
+RUN chmod +x /opt/d2slam/scripts/*.sh
+
+# Install all dependencies during build time
+RUN /opt/d2slam/scripts/00_setup_ssh.sh
+RUN /opt/d2slam/scripts/01_install_ros_dependencies.sh
+RUN /opt/d2slam/scripts/02_install_cmake.sh
+RUN /opt/d2slam/scripts/03_install_tensorrt.sh
+RUN /opt/d2slam/scripts/04_install_opencv_cuda.sh
+RUN /opt/d2slam/scripts/05_install_ceres_solver.sh
+RUN /opt/d2slam/scripts/06_install_lcm.sh
+RUN /opt/d2slam/scripts/07_install_faiss.sh
+RUN /opt/d2slam/scripts/08_install_opengv.sh
+RUN /opt/d2slam/scripts/09_install_backward_cpp.sh
+RUN /opt/d2slam/scripts/10_install_onnxruntime.sh
+RUN /opt/d2slam/scripts/11_install_pytorch.sh
+RUN /opt/d2slam/scripts/12_install_taichislam_deps.sh
+RUN /opt/d2slam/scripts/13_install_spdlog.sh
+
+# Set working directory
+WORKDIR ${SWARM_WS}
+
+# Default command
+CMD ["/bin/bash"]
+
+# SSH port
+EXPOSE 22
+
+# Note: This image has all dependencies pre-installed and is ready to use

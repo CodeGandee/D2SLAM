@@ -1,0 +1,46 @@
+# D2SLAM JetPack 6.2 - Modular Base Image (Runtime Installation)
+# Ubuntu 20.04 for ROS Noetic compatibility in Docker on JetPack 6.2 host
+# Using Ubuntu 20.04 base + CUDA runtime for proper ROS Noetic support
+# The L4T drivers will be mounted from the JetPack 6.2 host system
+
+FROM nvidia/cuda:12.6.0-runtime-ubuntu20.04
+
+# Build arguments
+ARG CERES_VERSION=2.1.0
+ARG CMAKE_VERSION=3.24.1
+ARG OPENCV_VERSION=4.10.0
+ARG ROS_VERSION=noetic
+ARG FAISS_VERSION=1.7.4
+ARG USE_PROC=8
+ARG CUDA_ARCH_BIN="8.7"
+ARG ENABLE_NEON="ON"
+ARG SSH_PASSWORD=d2slam123
+
+# Environment variables
+ENV SWARM_WS=/root/swarm_ws
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Beijing
+
+# Copy installation scripts
+COPY scripts/ /opt/d2slam/scripts/
+RUN chmod +x /opt/d2slam/scripts/*.sh
+
+# Setup basic environment and SSH (for development)
+RUN /opt/d2slam/scripts/00_setup_ssh.sh
+
+# Set working directory
+WORKDIR ${SWARM_WS}
+
+# Default command
+CMD ["/bin/bash"]
+
+# SSH port
+EXPOSE 22
+
+# Note: Dependencies are NOT installed automatically in this image
+# You must run the installation scripts manually at runtime:
+#   ./scripts/install_all.sh
+# Or individual scripts:
+#   ./scripts/01_install_ros_dependencies.sh
+#   ./scripts/02_install_cmake.sh
+#   ... etc

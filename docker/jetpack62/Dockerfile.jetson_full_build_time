@@ -1,0 +1,39 @@
+# D2SLAM JetPack 6.2 - Complete D2SLAM Build
+# This builds D2SLAM on top of the build-time base image
+
+ARG BASE_IMAGE=d2slam:jetson-orin-36.4.0-base-build-time
+FROM ${BASE_IMAGE}
+
+# Build arguments for D2SLAM
+ARG D2SLAM_REPO=https://github.com/CodeGandee/D2SLAM.git
+ARG D2SLAM_BRANCH=main
+
+# Environment variables
+ENV SWARM_WS=/root/swarm_ws
+
+# Clone D2SLAM repository if not mounted
+RUN if [ ! -d "${SWARM_WS}/src/D2SLAM" ]; then \
+        mkdir -p ${SWARM_WS}/src && \
+        cd ${SWARM_WS}/src && \
+        git clone ${D2SLAM_REPO} && \
+        cd D2SLAM && \
+        git checkout ${D2SLAM_BRANCH}; \
+    fi
+
+# Build D2SLAM
+RUN /opt/d2slam/scripts/14_build_d2slam.sh
+
+# Setup ROS environment
+RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc && \
+    echo "source ${SWARM_WS}/devel/setup.bash" >> ~/.bashrc
+
+# Set working directory
+WORKDIR ${SWARM_WS}
+
+# Default command
+CMD ["/bin/bash"]
+
+# SSH port
+EXPOSE 22
+
+# Note: This image has D2SLAM fully built and ready to run
