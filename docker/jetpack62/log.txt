@@ -1,0 +1,192 @@
+#1 [internal] load local bake definitions
+#1 reading from stdin 2.40kB done
+#1 DONE 0.0s
+
+#2 [d2slam-dev internal] load build definition from Dockerfile.jetson_orin_base_36.4.0_minimal
+#2 transferring dockerfile: 6.33kB done
+#2 DONE 0.0s
+
+#3 [d2slam-full internal] load build definition from Dockerfile.jetson_orin_base_36.4.0
+#3 transferring dockerfile: 9.57kB done
+#3 DONE 0.0s
+
+#4 [d2slam-full internal] load metadata for nvcr.io/nvidia/l4t-cuda:12.6.11-runtime
+#4 DONE 0.2s
+
+#5 [d2slam-minimal internal] load .dockerignore
+#5 transferring context: 2B done
+#5 DONE 0.0s
+
+#6 [d2slam-full  1/18] FROM nvcr.io/nvidia/l4t-cuda:12.6.11-runtime@sha256:49853e9fe2a0305efa51fcbb3426eea1bca658085f2d26bb40347711434849b1
+#6 DONE 0.0s
+
+#7 [d2slam-full  2/16] RUN   apt-get -y update &&       TZ=Asia/Beijing apt-get -y install tzdata &&       apt-get install -y wget curl lsb-release git       libatlas-base-dev       libeigen3-dev       libgoogle-glog-dev       libsuitesparse-dev       libglib2.0-dev       libyaml-cpp-dev       net-tools       htop       xterm       gdb       zip       unzip       libdw-dev       vim       xterm       software-properties-common       ca-certificates       gnupg
+#7 CACHED
+
+#8 [d2slam-dev  2/18] RUN   apt-get -y update &&       TZ=Asia/Beijing apt-get -y install tzdata &&       apt-get install -y wget curl lsb-release git       libatlas-base-dev       libeigen3-dev       libgoogle-glog-dev       libsuitesparse-dev       libglib2.0-dev       libyaml-cpp-dev       net-tools       htop       xterm       gdb       zip       unzip       libdw-dev       vim       software-properties-common       ca-certificates       gnupg
+#8 CACHED
+
+#9 [d2slam-dev  3/18] RUN   echo "Skipping TensorRT installation - will use host system libraries"
+#9 CACHED
+
+#10 [d2slam-dev  4/18] RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu focal main" > /etc/apt/sources.list.d/ros-latest.list' &&       curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add - &&       apt-get update &&       apt-get install -y  --no-install-recommends       ros-noetic-ros-base       ros-noetic-nav-msgs       ros-noetic-sensor-msgs       ros-noetic-cv-bridge       ros-noetic-rviz       ros-noetic-image-transport-plugins       ros-noetic-pcl-ros       build-essential       ros-noetic-catkin       python3-catkin-tools python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential &&       rosdep init && rosdep update
+#10 0.234 Warning: apt-key is deprecated. Manage keyring files in trusted.gpg.d instead (see apt-key(8)).
+#10 0.405 OK
+#10 0.668 Hit:1 http://ports.ubuntu.com/ubuntu-ports jammy InRelease
+#10 0.684 Get:2 http://packages.ros.org/ros/ubuntu focal InRelease [4679 B]
+#10 0.687 Hit:3 http://ports.ubuntu.com/ubuntu-ports jammy-updates InRelease
+#10 0.717 Hit:4 http://ports.ubuntu.com/ubuntu-ports jammy-backports InRelease
+#10 0.747 Hit:5 http://ports.ubuntu.com/ubuntu-ports jammy-security InRelease
+#10 0.939 Get:6 http://packages.ros.org/ros/ubuntu focal/main arm64 Packages [826 kB]
+#10 1.246 Fetched 830 kB in 1s (1086 kB/s)
+#10 1.246 Reading package lists...
+#10 2.538 W: http://packages.ros.org/ros/ubuntu/dists/focal/InRelease: Key is stored in legacy trusted.gpg keyring (/etc/apt/trusted.gpg), see the DEPRECATION section in apt-key(8) for details.
+#10 2.585 Reading package lists...
+#10 3.869 Building dependency tree...
+#10 4.234 Reading state information...
+#10 4.430 Some packages could not be installed. This may mean that you have
+#10 4.430 requested an impossible situation or if you are using the unstable
+#10 4.430 distribution that some required packages have not yet been created
+#10 4.430 or been moved out of Incoming.
+#10 4.430 The following information may help to resolve the situation:
+#10 4.430 
+#10 4.430 The following packages have unmet dependencies:
+#10 4.753  ros-noetic-actionlib : Depends: libboost-thread1.71.0 but it is not installable
+#10 4.753  ros-noetic-bondcpp : Depends: libboost-thread1.71.0 but it is not installable
+#10 4.753  ros-noetic-class-loader : Depends: libboost-filesystem1.71.0 but it is not installable
+#10 4.753                            Depends: libconsole-bridge0.4 but it is not installable
+#10 4.753                            Depends: libpocofoundation62 (>= 1.9.2) but it is not installable
+#10 4.753  ros-noetic-compressed-depth-image-transport : Depends: libconsole-bridge0.4 but it is not installable
+#10 4.753                                                Depends: libopencv-core4.2 (>= 4.2.0+dfsg) but it is not installable
+#10 4.753                                                Depends: libopencv-imgcodecs4.2 (>= 4.2.0+dfsg) but it is not installable
+#10 4.753                                                Depends: ros-noetic-image-transport but it is not going to be installed
+#10 4.753  ros-noetic-compressed-image-transport : Depends: libconsole-bridge0.4 but it is not installable
+#10 4.753                                          Depends: libopencv-core4.2 (>= 4.2.0+dfsg) but it is not installable
+#10 4.753                                          Depends: libopencv-imgcodecs4.2 (>= 4.2.0+dfsg) but it is not installable
+#10 4.753                                          Depends: libopencv-imgproc4.2 (>= 4.2.0+dfsg) but it is not installable
+#10 4.753                                          Depends: ros-noetic-image-transport but it is not going to be installed
+#10 4.753  ros-noetic-cpp-common : Depends: libconsole-bridge0.4 but it is not installable
+#10 4.753  ros-noetic-cv-bridge : Depends: libboost-python1.71.0 but it is not installable
+#10 4.753                         Depends: libboost-python1.71.0-py38 but it is not installable
+#10 4.753                         Depends: libboost-regex1.71.0-icu66 but it is not installable
+#10 4.753                         Depends: libopencv-core4.2 (>= 4.2.0+dfsg) but it is not installable
+#10 4.753                         Depends: libopencv-imgcodecs4.2 (>= 4.2.0+dfsg) but it is not installable
+#10 4.753                         Depends: libopencv-imgproc4.2 (>= 4.2.0+dfsg) but it is not installable
+#10 4.753                         Depends: libpython3.8 (>= 3.8.2) but it is not installable
+#10 4.753  ros-noetic-nodelet : Depends: libboost-filesystem1.71.0 but it is not installable
+#10 4.753                       Depends: libboost-thread1.71.0 but it is not installable
+#10 4.753                       Depends: libconsole-bridge0.4 but it is not installable
+#10 4.753                       Depends: libtinyxml2-6a (>= 5.0.0) but it is not installable
+#10 4.753  ros-noetic-pcl-ros : Depends: libboost-filesystem1.71.0 but it is not installable
+#10 4.753                       Depends: libconsole-bridge0.4 but it is not installable
+#10 4.753                       Depends: libpcl-common1.10 (>= 1.10.0+dfsg) but it is not installable
+#10 4.753                       Depends: libpcl-features1.10 (>= 1.10.0+dfsg) but it is not installable
+#10 4.753                       Depends: libpcl-filters1.10 (>= 1.10.0+dfsg) but it is not installable
+#10 4.753                       Depends: libpcl-io1.10 (>= 1.10.0+dfsg) but it is not installable
+#10 4.753                       Depends: libpcl-search1.10 (>= 1.10.0+dfsg) but it is not installable
+#10 4.753                       Depends: libpcl-segmentation1.10 (>= 1.10.0+dfsg) but it is not installable
+#10 4.753                       Depends: libpcl-surface1.10 (>= 1.10.0+dfsg) but it is not installable
+#10 4.753                       Depends: ros-noetic-tf but it is not going to be installed
+#10 4.753                       Depends: ros-noetic-tf2 but it is not going to be installed
+#10 4.753                       Depends: ros-noetic-tf2-eigen but it is not going to be installed
+#10 4.753                       Depends: ros-noetic-tf2-ros but it is not going to be installed
+#10 4.753  ros-noetic-pluginlib : Depends: libboost-filesystem1.71.0 but it is not installable
+#10 4.753  ros-noetic-rosbag : Depends: libboost-filesystem1.71.0 but it is not installable
+#10 4.753                      Depends: libboost-program-options1.71.0 but it is not installable
+#10 4.753                      Depends: libboost-regex1.71.0-icu66 but it is not installable
+#10 4.753                      Depends: libboost-thread1.71.0 but it is not installable
+#10 4.753                      Depends: libconsole-bridge0.4 but it is not installable
+#10 4.753                      Depends: ros-noetic-rosbag-storage but it is not going to be installed
+#10 4.753  ros-noetic-rosconsole : Depends: libboost-regex1.71.0-icu66 but it is not installable
+#10 4.753                          Depends: liblog4cxx10v5 (>= 0.10.0) but it is not installable
+#10 4.753  ros-noetic-rosconsole-bridge : Depends: libconsole-bridge0.4 but it is not installable
+#10 4.753  ros-noetic-roscpp : Depends: libboost-chrono1.71.0 but it is not installable
+#10 4.753                      Depends: libboost-filesystem1.71.0 but it is not installable
+#10 4.753                      Depends: libboost-thread1.71.0 but it is not installable
+#10 4.753  ros-noetic-rospack : Depends: libboost-filesystem1.71.0 but it is not installable
+#10 4.753                       Depends: libboost-program-options1.71.0 but it is not installable
+#10 4.753                       Depends: libpython3.8 (>= 3.8.2) but it is not installable
+#10 4.753                       Depends: libtinyxml2-6a (>= 5.0.0) but it is not installable
+#10 4.753  ros-noetic-rviz : Depends: libboost-filesystem1.71.0 but it is not installable
+#10 4.753                    Depends: libboost-program-options1.71.0 but it is not installable
+#10 4.753                    Depends: libboost-thread1.71.0 but it is not installable
+#10 4.753                    Depends: libconsole-bridge0.4 but it is not installable
+#10 4.753                    Depends: libtinyxml2-6a (>= 5.0.0) but it is not installable
+#10 4.753                    Depends: liburdfdom-world but it is not installable
+#10 4.753                    Depends: libyaml-cpp0.6 (>= 0.6.2) but it is not installable
+#10 4.753                    Depends: ros-noetic-image-transport but it is not going to be installed
+#10 4.753                    Depends: ros-noetic-interactive-markers but it is not going to be installed
+#10 4.753                    Depends: ros-noetic-laser-geometry but it is not going to be installed
+#10 4.753                    Depends: ros-noetic-tf2-geometry-msgs but it is not going to be installed
+#10 4.753                    Depends: ros-noetic-tf2-ros but it is not going to be installed
+#10 4.753                    Depends: ros-noetic-urdf but it is not going to be installed
+#10 4.753  ros-noetic-theora-image-transport : Depends: libconsole-bridge0.4 but it is not installable
+#10 4.753                                      Depends: libopencv-core4.2 (>= 4.2.0+dfsg) but it is not installable
+#10 4.753                                      Depends: libopencv-imgproc4.2 (>= 4.2.0+dfsg) but it is not installable
+#10 4.753                                      Depends: ros-noetic-image-transport but it is not going to be installed
+#10 4.758 E: Unable to correct problems, you have held broken packages.
+#10 ERROR: process "/bin/sh -c sh -c 'echo \"deb http://packages.ros.org/ros/ubuntu focal main\" > /etc/apt/sources.list.d/ros-latest.list' &&       curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add - &&       apt-get update &&       apt-get install -y  --no-install-recommends       ros-${ROS_VERSION}-ros-base       ros-${ROS_VERSION}-nav-msgs       ros-${ROS_VERSION}-sensor-msgs       ros-${ROS_VERSION}-cv-bridge       ros-${ROS_VERSION}-rviz       ros-${ROS_VERSION}-image-transport-plugins       ros-${ROS_VERSION}-pcl-ros       build-essential       ros-${ROS_VERSION}-catkin       python3-catkin-tools python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential &&       rosdep init && rosdep update" did not complete successfully: exit code: 100
+
+#11 [d2slam-full  3/16] RUN   set -e &&       (wget --timeout=30 --tries=3 https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/sbsa/cuda-keyring_1.0-1_all.deb &&        dpkg -i cuda-keyring_1.0-1_all.deb &&        apt-get update &&        apt-get install -y --no-install-recommends          libnvinfer10 libnvinfer-plugin10 libnvparsers10 libnvonnxparsers10          libnvinfer-dev libnvinfer-plugin-dev libnvparsers-dev libnvonnxparsers-dev          python3-libnvinfer python3-libnvinfer-dev &&        rm -f cuda-keyring_1.0-1_all.deb &&        echo "TensorRT installed successfully via CUDA keyring") ||       (wget --timeout=30 --tries=3 https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/sbsa/cuda-ubuntu2004.pin &&        mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600 &&        apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/sbsa/3bf863cc.pub &&        add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/sbsa/ /" &&        apt-get update &&        apt-get install -y --no-install-recommends          libnvinfer10 libnvinfer-plugin10 libnvparsers10 libnvonnxparsers10          libnvinfer-dev libnvinfer-plugin-dev libnvparsers-dev libnvonnxparsers-dev          python3-libnvinfer python3-libnvinfer-dev &&        echo "TensorRT installed successfully via alternative method") ||       (echo "Warning: TensorRT packages not available, will rely on host system TensorRT")
+#11 0.167 --2025-08-28 07:08:31--  https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/sbsa/cuda-keyring_1.0-1_all.deb
+#11 0.170 Resolving developer.download.nvidia.com (developer.download.nvidia.com)... 23.45.46.167, 23.45.46.164
+#11 0.212 Connecting to developer.download.nvidia.com (developer.download.nvidia.com)|23.45.46.167|:443... connected.
+#11 0.240 HTTP request sent, awaiting response... 200 OK
+#11 0.262 Length: 4328 (4.2K) [application/x-deb]
+#11 0.262 Saving to: 'cuda-keyring_1.0-1_all.deb'
+#11 0.262 
+#11 0.262      0K ....                                                  100% 2.72G=0s
+#11 0.262 
+#11 0.262 2025-08-28 07:08:31 (2.72 GB/s) - 'cuda-keyring_1.0-1_all.deb' saved [4328/4328]
+#11 0.262 
+#11 0.295 Selecting previously unselected package cuda-keyring.
+#11 0.312 (Reading database ... 26396 files and directories currently installed.)
+#11 0.314 Preparing to unpack cuda-keyring_1.0-1_all.deb ...
+#11 0.317 Unpacking cuda-keyring (1.0-1) ...
+#11 0.345 Setting up cuda-keyring (1.0-1) ...
+#11 0.510 Get:1 https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/sbsa  InRelease [1579 B]
+#11 0.592 Get:2 https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/sbsa  Packages [1881 kB]
+#11 0.707 Hit:3 http://ports.ubuntu.com/ubuntu-ports jammy InRelease
+#11 0.814 Hit:4 http://ports.ubuntu.com/ubuntu-ports jammy-updates InRelease
+#11 0.921 Hit:5 http://ports.ubuntu.com/ubuntu-ports jammy-backports InRelease
+#11 1.029 Hit:6 http://ports.ubuntu.com/ubuntu-ports jammy-security InRelease
+#11 1.140 Fetched 1882 kB in 1s (2729 kB/s)
+#11 1.140 Reading package lists...
+#11 2.504 Reading package lists...
+#11 3.829 Building dependency tree...
+#11 4.220 Reading state information...
+#11 4.234 E: Unable to locate package libnvinfer10
+#11 4.234 E: Unable to locate package libnvinfer-plugin10
+#11 4.234 E: Unable to locate package libnvparsers10
+#11 4.234 E: Unable to locate package libnvonnxparsers10
+#11 4.239 --2025-08-28 07:08:35--  https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/sbsa/cuda-ubuntu2004.pin
+#11 4.241 Resolving developer.download.nvidia.com (developer.download.nvidia.com)... 23.45.46.167, 23.45.46.164
+#11 4.242 Connecting to developer.download.nvidia.com (developer.download.nvidia.com)|23.45.46.167|:443... connected.
+#11 4.270 HTTP request sent, awaiting response... 200 OK
+#11 4.304 Length: 190 [application/octet-stream]
+#11 4.304 Saving to: 'cuda-ubuntu2004.pin'
+#11 4.304 
+#11 4.304      0K                                                       100% 5.14M=0s
+#11 4.305 
+#11 4.305 2025-08-28 07:08:35 (5.14 MB/s) - 'cuda-ubuntu2004.pin' saved [190/190]
+#11 4.305 
+#11 4.367 Warning: apt-key is deprecated. Manage keyring files in trusted.gpg.d instead (see apt-key(8)).
+#11 4.391 Executing: /tmp/apt-key-gpghome.7yRoj3cImI/gpg.1.sh --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/sbsa/3bf863cc.pub
+#11 4.394 gpg: requesting key from 'https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/sbsa/3bf863cc.pub'
+#11 4.620 gpg: key A4B469963BF863CC: "cudatools <cudatools@nvidia.com>" not changed
+#11 4.620 gpg: Total number processed: 1
+#11 4.620 gpg:              unchanged: 1
+#11 CANCELED
+------
+ > [d2slam-dev  4/18] RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu focal main" > /etc/apt/sources.list.d/ros-latest.list' &&       curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add - &&       apt-get update &&       apt-get install -y  --no-install-recommends       ros-noetic-ros-base       ros-noetic-nav-msgs       ros-noetic-sensor-msgs       ros-noetic-cv-bridge       ros-noetic-rviz       ros-noetic-image-transport-plugins       ros-noetic-pcl-ros       build-essential       ros-noetic-catkin       python3-catkin-tools python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential &&       rosdep init && rosdep update:
+4.753                    Depends: ros-noetic-interactive-markers but it is not going to be installed
+4.753                    Depends: ros-noetic-laser-geometry but it is not going to be installed
+4.753                    Depends: ros-noetic-tf2-geometry-msgs but it is not going to be installed
+4.753                    Depends: ros-noetic-tf2-ros but it is not going to be installed
+4.753                    Depends: ros-noetic-urdf but it is not going to be installed
+4.753  ros-noetic-theora-image-transport : Depends: libconsole-bridge0.4 but it is not installable
+4.753                                      Depends: libopencv-core4.2 (>= 4.2.0+dfsg) but it is not installable
+4.753                                      Depends: libopencv-imgproc4.2 (>= 4.2.0+dfsg) but it is not installable
+4.753                                      Depends: ros-noetic-image-transport but it is not going to be installed
+4.758 E: Unable to correct problems, you have held broken packages.
+------

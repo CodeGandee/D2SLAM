@@ -1,5 +1,5 @@
 #Ubuntu 20.04 for ROS Noetic compatibility - Minimal TensorRT version
-FROM nvcr.io/nvidia/l4t-cuda:12.6.11-runtime
+FROM nvidia/cuda:12.6.0-runtime-ubuntu20.04
 ARG CERES_VERSION=2.1.0
 ENV SWARM_WS=/root/swarm_ws
 ARG CMAKE_VERSION=3.24.1
