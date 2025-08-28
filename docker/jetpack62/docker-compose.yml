@@ -1,1 +1,305 @@
-version: "3.8"
+# D2SLAM JetPack 6.2 Docker Compose Configuration
+
+services:
+  # Development container with runtime flexibility
+  d2slam-dev:
+    build:
+      context: ..
+      dockerfile: jetpack62/Dockerfile.jetson_orin_base_36.4.0_modular
+      args:
+        SSH_PASSWORD: ${SSH_PASSWORD:-d2slam123}
+        CERES_VERSION: ${CERES_VERSION:-2.1.0}
+        CMAKE_VERSION: ${CMAKE_VERSION:-3.24.1}
+        OPENCV_VERSION: ${OPENCV_VERSION:-4.10.0}
+        ROS_VERSION: ${ROS_VERSION:-noetic}
+        FAISS_VERSION: ${FAISS_VERSION:-1.7.4}
+        USE_PROC: ${USE_PROC:-8}
+        CUDA_ARCH_BIN: ${CUDA_ARCH_BIN:-8.7}
+        ENABLE_NEON: ${ENABLE_NEON:-ON}
+    image: d2slam:jetson-orin-36.4.0-dev
+    container_name: d2slam-jetpack62-dev
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
+      - NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:-all}
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - TZ=${CONTAINER_TIMEZONE:-Asia/Beijing}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ../..:/root/swarm_ws/src/D2SLAM:rw
+      - /dev:/dev:rw
+    privileged: true
+    network_mode: host
+    stdin_open: true
+    tty: true
+    ports:
+      - "${SSH_PORT:-2222}:22"
+    command: bash -c "/usr/local/bin/start-ssh.sh && /bin/bash"
+
+# D2SLAM JetPack 6.2 Docker Compose Configuration
+#
+# This configuration provides multiple build profiles for different use cases:
+#
+# PROFILES:
+#   development  - Scripts available, MANUAL installation required at runtime
+#   runtime      - Same as development (alternative name)
+#   build-time   - Dependencies AUTOMATICALLY installed during Docker build
+#   full-build   - Complete D2SLAM AUTOMATICALLY built during Docker build
+#   legacy       - Original monolithic Dockerfiles (for compatibility)
+#
+# INSTALLATION METHODS:
+#
+# MANUAL RUNTIME INSTALLATION (development/runtime profiles):
+#   - Smaller images, flexible development
+#   - YOU MUST run installation scripts manually after container starts
+#   - Use: ./manage.sh install-deps (installs all dependencies)
+#   - Or run individual scripts: /opt/d2slam/scripts/01_install_ros_dependencies.sh
+#
+# AUTOMATIC BUILD-TIME INSTALLATION (build-time/full-build profiles):
+#   - Larger images, production ready
+#   - All dependencies automatically installed during Docker build
+#   - Container ready to use immediately after start
+#
+# USAGE EXAMPLES:
+#
+# 1. Development (MANUAL Runtime Installation - Requires manual setup):
+#    ./manage.sh build development
+#    ./manage.sh run d2slam-dev
+#    ./manage.sh shell
+#    ./manage.sh install-deps     # ⚠️ REQUIRED: Install dependencies manually
+#    ./manage.sh build-d2slam     # ⚠️ REQUIRED: Build D2SLAM manually
+#
+# 2. Build-time Installation (AUTOMATIC - Ready to use):
+#    ./manage.sh build build-time
+#    ./manage.sh run d2slam-base-build-time  # ✅ Dependencies already installed
+#
+# 3. Full Build (AUTOMATIC - Complete ready-to-use image):
+#    ./manage.sh build full-build
+#    ./manage.sh run d2slam-full-build-time  # ✅ D2SLAM already built and ready
+#
+# 4. Legacy Mode (Original monolithic Dockerfiles):
+#    ./manage.sh build legacy
+#    ./manage.sh run d2slam-legacy-full
+#
+# SERVICES:
+#   d2slam-dev                - Development container with runtime flexibility
+#   d2slam-base-runtime       - Base container with runtime installation
+#   d2slam-base-build-time    - Base container with build-time installation
+#   d2slam-full-build-time    - Complete D2SLAM built at build-time
+#   d2slam-legacy-full        - Original full build (legacy compatibility)
+#   d2slam-legacy-minimal     - Original minimal build (legacy compatibility)
+
+services:
+  # Development container with runtime flexibility
+  d2slam-dev:
+    profiles: ["development", "runtime"]
+    build:
+      context: ..
+      dockerfile: jetpack62/Dockerfile.jetson_orin_base_36.4.0_modular
+      args:
+        SSH_PASSWORD: ${SSH_PASSWORD:-d2slam123}
+        CERES_VERSION: ${CERES_VERSION:-2.1.0}
+        CMAKE_VERSION: ${CMAKE_VERSION:-3.24.1}
+        OPENCV_VERSION: ${OPENCV_VERSION:-4.10.0}
+        ROS_VERSION: ${ROS_VERSION:-noetic}
+        FAISS_VERSION: ${FAISS_VERSION:-1.7.4}
+        USE_PROC: ${USE_PROC:-8}
+        CUDA_ARCH_BIN: ${CUDA_ARCH_BIN:-8.7}
+        ENABLE_NEON: ${ENABLE_NEON:-ON}
+    image: d2slam:jetson-orin-36.4.0-dev
+    container_name: d2slam-jetpack62-dev
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
+      - NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:-all}
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - TZ=${CONTAINER_TIMEZONE:-Asia/Beijing}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ../..:/root/swarm_ws/src/D2SLAM:rw
+      - /dev:/dev:rw
+      - ./dev_tools:/root/dev_tools:rw
+    privileged: true
+    network_mode: host
+    stdin_open: true
+    tty: true
+    ports:
+      - "${SSH_PORT:-2222}:22"
+    command: bash -c "/usr/local/bin/start-ssh.sh && /bin/bash"
+
+  # Base container with runtime installation flexibility
+  d2slam-base-runtime:
+    profiles: ["runtime"]
+    build:
+      context: ..
+      dockerfile: jetpack62/Dockerfile.jetson_orin_base_36.4.0_modular
+      args:
+        SSH_PASSWORD: ${SSH_PASSWORD:-d2slam123}
+        CERES_VERSION: ${CERES_VERSION:-2.1.0}
+        CMAKE_VERSION: ${CMAKE_VERSION:-3.24.1}
+        OPENCV_VERSION: ${OPENCV_VERSION:-4.10.0}
+        ROS_VERSION: ${ROS_VERSION:-noetic}
+        FAISS_VERSION: ${FAISS_VERSION:-1.7.4}
+        USE_PROC: ${USE_PROC:-8}
+        CUDA_ARCH_BIN: ${CUDA_ARCH_BIN:-8.7}
+        ENABLE_NEON: ${ENABLE_NEON:-ON}
+    image: d2slam:jetson-orin-36.4.0-base-runtime
+    container_name: d2slam-jetpack62-base-runtime
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
+      - NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:-all}
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - TZ=${CONTAINER_TIMEZONE:-Asia/Beijing}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ../..:/root/swarm_ws/src/D2SLAM:rw
+      - /dev:/dev:rw
+    privileged: true
+    network_mode: host
+    stdin_open: true
+    tty: true
+    ports:
+      - "${SSH_PORT:-2222}:22"
+    command: bash -c "/usr/local/bin/start-ssh.sh && /bin/bash"
+
+  # Base container with build-time installation
+  d2slam-base-build-time:
+    profiles: ["build-time"]
+    build:
+      context: ..
+      dockerfile: jetpack62/Dockerfile.jetson_orin_base_36.4.0_build_time
+      args:
+        SSH_PASSWORD: ${SSH_PASSWORD:-d2slam123}
+        CERES_VERSION: ${CERES_VERSION:-2.1.0}
+        CMAKE_VERSION: ${CMAKE_VERSION:-3.24.1}
+        OPENCV_VERSION: ${OPENCV_VERSION:-4.10.0}
+        ROS_VERSION: ${ROS_VERSION:-noetic}
+        FAISS_VERSION: ${FAISS_VERSION:-1.7.4}
+        USE_PROC: ${USE_PROC:-8}
+        CUDA_ARCH_BIN: ${CUDA_ARCH_BIN:-8.7}
+        ENABLE_NEON: ${ENABLE_NEON:-ON}
+    image: d2slam:jetson-orin-36.4.0-base-build-time
+    container_name: d2slam-jetpack62-base-build-time
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
+      - NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:-all}
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - TZ=${CONTAINER_TIMEZONE:-Asia/Beijing}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ../..:/root/swarm_ws/src/D2SLAM:rw
+      - /dev:/dev:rw
+    privileged: true
+    network_mode: host
+    stdin_open: true
+    tty: true
+    ports:
+      - "${SSH_PORT:-2222}:22"
+    command: bash -c "/usr/local/bin/start-ssh.sh && /bin/bash"
+
+  # Complete D2SLAM built at build-time
+  d2slam-full-build-time:
+    profiles: ["full-build"]
+    build:
+      context: ..
+      dockerfile: jetpack62/Dockerfile.jetson_full_build_time
+      args:
+        BASE_IMAGE: d2slam:jetson-orin-36.4.0-base-build-time
+        D2SLAM_REPO: ${D2SLAM_REPO:-https://github.com/CodeGandee/D2SLAM.git}
+        D2SLAM_BRANCH: ${D2SLAM_BRANCH:-main}
+    image: d2slam:jetson-orin-36.4.0-full-build-time
+    container_name: d2slam-jetpack62-full-build-time
+    depends_on:
+      - d2slam-base-build-time
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
+      - NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:-all}
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - TZ=${CONTAINER_TIMEZONE:-Asia/Beijing}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ../..:/root/swarm_ws/src/D2SLAM:rw
+      - /dev:/dev:rw
+    privileged: true
+    network_mode: host
+    stdin_open: true
+    tty: true
+    ports:
+      - "${SSH_PORT:-2222}:22"
+    command: bash -c "/usr/local/bin/start-ssh.sh && /bin/bash"
+
+  # Legacy: Original full build for compatibility
+  d2slam-legacy-full:
+    profiles: ["legacy"]
+    build:
+      context: ..
+      dockerfile: jetpack62/Dockerfile.jetson_orin_base_36.4.0
+      args:
+        - CERES_VERSION=${CERES_VERSION:-2.1.0}
+        - CMAKE_VERSION=${CMAKE_VERSION:-3.24.1}
+        - OPENCV_VERSION=${OPENCV_VERSION:-4.10.0}
+        - ROS_VERSION=${ROS_VERSION:-noetic}
+        - FAISS_VERSION=${FAISS_VERSION:-1.7.4}
+        - USE_PROC=${USE_PROC:-8}
+        - CUDA_ARCH_BIN=${CUDA_ARCH_BIN:-8.7}
+        - ENABLE_NEON=${ENABLE_NEON:-ON}
+    image: d2slam:jetson-orin-36.4.0-legacy-full
+    container_name: d2slam-jetpack62-legacy-full
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
+      - NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:-all}
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - TZ=${CONTAINER_TIMEZONE:-Asia/Beijing}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ../..:/root/swarm_ws/src/D2SLAM:rw
+      - /dev:/dev:rw
+    privileged: true
+    network_mode: host
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+
+  # Legacy: Original minimal build for compatibility
+  d2slam-legacy-minimal:
+    profiles: ["legacy"]
+    build:
+      context: ..
+      dockerfile: jetpack62/Dockerfile.jetson_orin_base_36.4.0_minimal
+      args:
+        - CERES_VERSION=${CERES_VERSION:-2.1.0}
+        - CMAKE_VERSION=${CMAKE_VERSION:-3.24.1}
+        - OPENCV_VERSION=${OPENCV_VERSION:-4.10.0}
+        - ROS_VERSION=${ROS_VERSION:-noetic}
+        - FAISS_VERSION=${FAISS_VERSION:-1.7.4}
+        - USE_PROC=${USE_PROC:-8}
+        - CUDA_ARCH_BIN=${CUDA_ARCH_BIN:-8.7}
+        - ENABLE_NEON=${ENABLE_NEON:-ON}
+    image: d2slam:jetson-orin-36.4.0-legacy-minimal
+    container_name: d2slam-jetpack62-legacy-minimal
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
+      - NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:-all}
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - TZ=${CONTAINER_TIMEZONE:-Asia/Beijing}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ../..:/root/swarm_ws/src/D2SLAM:rw
+      - /dev:/dev:rw
+    privileged: true
+    network_mode: host
+    stdin_open: true
+    tty: true
+    command: /bin/bash
