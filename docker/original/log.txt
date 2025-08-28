@@ -1,0 +1,26 @@
+[1;33m[WARNING][0m NVIDIA runtime not detected. GPU features may not work.
+[0;34m[INFO][0m To enable GPU support, install nvidia-docker2 and restart Docker daemon.
+[0;34m[INFO][0m Building Docker images with profile: build-time
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.55kB done
+#1 DONE 0.0s
+
+#2 [d2slam-full-build-time internal] load build definition from Dockerfile.jetson_build_time
+#2 transferring dockerfile: 667B done
+#2 DONE 0.0s
+
+#3 [d2slam-base-build-time internal] load build definition from Dockerfile.jetson_orin_base_35.3.1_build_time
+#3 transferring dockerfile: 1.06kB done
+#3 DONE 0.0s
+
+#4 [d2slam-base-build-time internal] load metadata for nvcr.io/nvidia/l4t-jetpack:r35.3.1
+#4 ...
+
+#5 [d2slam-full-build-time internal] load metadata for docker.io/library/d2slam:jetson_orin_base_35.3.1_build_time
+#5 ERROR: pull access denied, repository does not exist or may require authorization: server message: insufficient_scope: authorization failed
+
+#4 [d2slam-base-build-time internal] load metadata for nvcr.io/nvidia/l4t-jetpack:r35.3.1
+#4 CANCELED
+------
+ > [d2slam-full-build-time internal] load metadata for docker.io/library/d2slam:jetson_orin_base_35.3.1_build_time:
+------
