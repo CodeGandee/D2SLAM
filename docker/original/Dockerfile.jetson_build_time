@@ -1,0 +1,26 @@
+FROM d2slam:jetson_orin_base_35.3.1_build_time
+
+ARG ROS_VERSION=noetic
+
+# SSH user configuration arguments (inherit from base)
+ARG SSH_USERNAME=me
+ARG SSH_PASSWORD=123456
+
+ENV SWARM_WS=/root/swarm_ws
+ENV SSH_USERNAME=${SSH_USERNAME}
+ENV SSH_PASSWORD=${SSH_PASSWORD}
+
+# Copy D2SLAM source code
+COPY ./ ${SWARM_WS}/src/D2SLAM
+
+# Copy and run D2SLAM build script
+COPY docker/original/scripts/13_build_d2slam.sh /opt/d2slam/scripts/
+RUN /opt/d2slam/scripts/13_build_d2slam.sh
+
+# Expose SSH port
+EXPOSE 22
+
+# Set startup command to start SSH service
+CMD ["/usr/local/bin/start-ssh.sh", "bash"]
+
+WORKDIR ${SWARM_WS}

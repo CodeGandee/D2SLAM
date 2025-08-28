@@ -1,0 +1,179 @@
+version: '3.8'
+
+# D2SLAM Original Jetson Docker Compose Configuration
+#
+# This configuration provides multiple build profiles for different use cases:
+#
+# PROFILES:
+#   development  - Scripts available, MANUAL installation required at runtime
+#   runtime      - Same as development (alternative name)
+#   build-time   - Dependencies AUTOMATICALLY installed during Docker build
+#   full-build   - Complete D2SLAM AUTOMATICALLY built during Docker build
+#
+# INSTALLATION METHODS:
+#
+# MANUAL RUNTIME INSTALLATION (development/runtime profiles):
+#   - Smaller images, flexible development
+#   - YOU MUST run installation scripts manually after container starts
+#   - Use: ./manage.sh install-deps (installs all dependencies)
+#   - Or run individual scripts: /opt/d2slam/scripts/01_install_ros_dependencies.sh
+#
+# AUTOMATIC BUILD-TIME INSTALLATION (build-time/full-build profiles):
+#   - Larger images, production ready
+#   - All dependencies automatically installed during Docker build
+#   - Container ready to use immediately after start
+#
+# USAGE EXAMPLES:
+#
+# 1. Development (MANUAL Runtime Installation - Requires manual setup):
+#    ./manage.sh build development
+#    ./manage.sh run d2slam-dev
+#    ./manage.sh shell
+#    ./manage.sh install-deps     # ⚠️ REQUIRED: Install dependencies manually
+#    ./manage.sh build-d2slam     # ⚠️ REQUIRED: Build D2SLAM manually
+#
+# 2. Build-time Installation (AUTOMATIC - Ready to use):
+#    ./manage.sh build build-time
+#    ./manage.sh run d2slam-base-build-time  # ✅ Dependencies already installed
+#
+# 3. Full Build (AUTOMATIC - Complete ready-to-use image):
+#    ./manage.sh build full-build
+#    ./manage.sh run d2slam-full-build-time  # ✅ D2SLAM already built and ready
+#
+# 4. Manual Docker Compose:
+#    docker compose --profile development build
+#    docker compose --profile development up d2slam-dev
+#    docker compose --profile build-time build
+#    docker compose --profile full-build build
+#
+# SERVICES:
+#   d2slam-dev                - Development container with runtime flexibility
+#   d2slam-base-runtime       - Base image with scripts for runtime installation
+#   d2slam-base-build-time    - Base image with all dependencies pre-built
+#   d2slam-full-build-time    - Complete D2SLAM image with everything pre-built
+#
+# SSH CONFIGURATION:
+#   All containers include SSH server with configurable user credentials
+#   Default: username=me, password=123456 (configurable via build args)
+#   Features: X11 forwarding, SFTP, root login enabled
+#   Port 22 exposed for SSH access
+
+services:
+  # Base image with all dependencies installed during build
+  d2slam-base-build-time:
+    build:
+      context: ../../
+      dockerfile: docker/original/Dockerfile.jetson_orin_base_35.3.1_build_time
+      args:
+        CMAKE_VERSION: "3.26.4"
+        OPENCV_VERSION: "4.5.4"
+        FAISS_VERSION: "1.7.4"
+        ONNX_VERSION: "1.12.1"
+        ROS_VERSION: "noetic"
+        ENABLE_NEON: "ON"
+        CUDA_ARCH_BIN: "8.7"
+        SSH_USERNAME: "${SSH_USERNAME:-me}"
+        SSH_PASSWORD: "${SSH_PASSWORD:-123456}"
+    image: d2slam:jetson_orin_base_35.3.1_build_time
+    profiles:
+      - build-time
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - DISPLAY=${DISPLAY:-:10.0}
+    ports:
+      - "2222:22"  # SSH access on host port 2222
+
+  # Base image with scripts ready for runtime installation
+  d2slam-base-runtime:
+    build:
+      context: ../../
+      dockerfile: docker/original/Dockerfile.jetson_orin_base_35.3.1_modular
+      args:
+        CMAKE_VERSION: "3.26.4"
+        OPENCV_VERSION: "4.5.4"
+        FAISS_VERSION: "1.7.4"
+        ONNX_VERSION: "1.12.1"
+        ROS_VERSION: "noetic"
+        ENABLE_NEON: "ON"
+        CUDA_ARCH_BIN: "8.7"
+        SSH_USERNAME: "${SSH_USERNAME:-me}"
+        SSH_PASSWORD: "${SSH_PASSWORD:-123456}"
+    image: d2slam:jetson_orin_base_35.3.1_modular
+    profiles:
+      - runtime
+      - development
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - DISPLAY=${DISPLAY:-:10.0}
+    volumes:
+      - ../../:/workspace/D2SLAM
+    working_dir: /workspace/D2SLAM
+    ports:
+      - "2223:22"  # SSH access on host port 2223
+    stdin_open: true
+    tty: true
+
+  # Full D2SLAM with everything built at build time
+  d2slam-full-build-time:
+    build:
+      context: ../../
+      dockerfile: docker/original/Dockerfile.jetson_build_time
+      args:
+        ROS_VERSION: "noetic"
+        SSH_USERNAME: "${SSH_USERNAME:-me}"
+        SSH_PASSWORD: "${SSH_PASSWORD:-123456}"
+    image: d2slam:jetson_build_time
+    profiles:
+      - build-time
+      - full-build
+    depends_on:
+      - d2slam-base-build-time
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - DISPLAY=${DISPLAY:-:10.0}
+    volumes:
+      - ../../:/workspace/D2SLAM
+    ports:
+      - "2224:22"  # SSH access on host port 2224
+
+  # D2SLAM for development with runtime flexibility
+  d2slam-dev:
+    build:
+      context: ../../
+      dockerfile: docker/original/Dockerfile.jetson_modular
+      args:
+        ROS_VERSION: "noetic"
+        SSH_USERNAME: "${SSH_USERNAME:-me}"
+        SSH_PASSWORD: "${SSH_PASSWORD:-123456}"
+    image: d2slam:jetson_modular
+    profiles:
+      - development
+      - runtime
+    depends_on:
+      - d2slam-base-runtime
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - ROS_VERSION=noetic
+      - SWARM_WS=/root/swarm_ws
+      - DISPLAY=${DISPLAY:-:10.0}
+    volumes:
+      - ../../:/workspace/D2SLAM
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /home/${USER}/.Xauthority:/root/.Xauthority:rw
+    network_mode: host
+    ports:
+      - "2225:22"  # SSH access on host port 2225
+    stdin_open: true
+    tty: true
+    working_dir: /workspace/D2SLAM
+
+volumes:
+  d2slam_data:

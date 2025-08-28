@@ -1,0 +1,64 @@
+FROM nvcr.io/nvidia/l4t-jetpack:r35.3.1
+
+# Build arguments with defaults
+ARG CMAKE_VERSION=3.26.4
+ARG OPENCV_VERSION=4.5.4
+ARG FAISS_VERSION=1.7.4
+ARG ONNX_VERSION=1.12.1
+ARG ROS_VERSION=noetic
+ARG ENABLE_NEON=ON
+ARG CUDA_ARCH_BIN=8.7
+
+# SSH user configuration arguments
+ARG SSH_USERNAME=me
+ARG SSH_PASSWORD=123456
+
+# Environment variables
+ENV CMAKE_VERSION=${CMAKE_VERSION}
+ENV OPENCV_VERSION=${OPENCV_VERSION}
+ENV FAISS_VERSION=${FAISS_VERSION}
+ENV ONNX_VERSION=${ONNX_VERSION}
+ENV ROS_VERSION=${ROS_VERSION}
+ENV ENABLE_NEON=${ENABLE_NEON}
+ENV CUDA_ARCH_BIN=${CUDA_ARCH_BIN}
+
+# SSH environment variables
+ENV SSH_USERNAME=${SSH_USERNAME}
+ENV SSH_PASSWORD=${SSH_PASSWORD}
+ENV DISPLAY=:10.0
+
+# Copy installation scripts
+COPY scripts/ /opt/d2slam/scripts/
+
+# Option 1: Run all installation steps during build
+# Uncomment the following line to install everything during build:
+# RUN /opt/d2slam/scripts/install_all.sh
+
+# Option 2: Install individual components (comment out install_all.sh above)
+# You can selectively install components by uncommenting specific lines:
+# RUN /opt/d2slam/scripts/01_install_ros_dependencies.sh
+# RUN /opt/d2slam/scripts/02_install_cmake.sh
+# RUN /opt/d2slam/scripts/03_install_opencv_cuda.sh
+# RUN /opt/d2slam/scripts/04_install_ceres_solver.sh
+# RUN /opt/d2slam/scripts/05_install_lcm.sh
+# RUN /opt/d2slam/scripts/06_install_faiss.sh
+# RUN /opt/d2slam/scripts/07_install_opengv.sh
+# RUN /opt/d2slam/scripts/08_install_backward_cpp.sh
+# RUN /opt/d2slam/scripts/09_install_onnxruntime.sh
+# RUN /opt/d2slam/scripts/10_install_pytorch.sh
+# RUN /opt/d2slam/scripts/11_install_taichislam_deps.sh
+# RUN /opt/d2slam/scripts/12_install_spdlog.sh
+
+# Default: Just make scripts executable for runtime installation
+RUN chmod +x /opt/d2slam/scripts/*.sh
+
+# Always setup SSH even in modular mode (lightweight)
+RUN /opt/d2slam/scripts/00_setup_ssh.sh
+
+# Expose SSH port
+EXPOSE 22
+
+# Set startup command to start SSH service
+CMD ["/usr/local/bin/start-ssh.sh", "bash"]
+
+WORKDIR /root

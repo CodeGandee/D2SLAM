@@ -30,10 +30,28 @@ The `jetpack62/` directory provides:
 - Development tools and validation
 - Complete documentation
 
-## Legacy Docker Builds
+## Alternative Docker Setups
 
+### Modular Jetson Setup (JetPack 5.x)
 
-## Legacy Docker Builds
+For **NVIDIA Jetson Orin with JetPack 5.x** or for modular development with runtime flexibility:
+
+```bash
+cd original
+./validate.sh             # Validate setup
+./manage.sh build development   # Build with runtime installation
+./manage.sh run d2slam-dev      # Run development container
+./manage.sh shell               # Enter container
+./manage.sh install-deps        # Install dependencies at runtime
+```
+
+The `original/` directory provides:
+- Modular shell scripts extracted from original Dockerfiles
+- Build-time vs runtime installation options
+- Docker Compose with multiple profiles
+- Individual component installation capability
+
+### Legacy Docker Builds
 
 ### Docker PC
 
